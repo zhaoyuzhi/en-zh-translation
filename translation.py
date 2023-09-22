@@ -27,14 +27,14 @@ def text_readlines(filename):
 
 def translate_single_sentence(inp_text, tokenizer, model, device):
     encode_text = tokenizer(inp_text, max_length=512, truncation=True, padding=True, return_tensors='pt').to(device)
-    out = model.generate(**encode_text, max_length=1024)
+    out = model.generate(**encode_text, max_length=512)
     out_text = tokenizer.decode(out[0])
-    out_text = out_text.replace("<pad> ", "").replace("<pad>", "")
+    out_text = out_text.replace("<pad> ", "").replace("<pad>", "").replace("</s>", "").replace("<unk>", "")
     return out_text
 
 if __name__  == '__main__':
 
-    # the input file paths
+    # define input file paths
     file_path = 'caption/llava_describe_advertisement_image.txt'
     save_path = file_path.split('.txt')[0] + '_translated.txt'
     model_path = 'Helsinki-NLP/opus-mt-en-zh'
@@ -51,4 +51,6 @@ if __name__  == '__main__':
         out = translate_single_sentence(src_text[i], tokenizer, model, device)
         print(i, len(src_text), out)
         translated_text.append(out)
+
+    # save the translated output
     text_save(translated_text, save_path)
